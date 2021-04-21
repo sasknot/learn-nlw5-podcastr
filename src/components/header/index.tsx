@@ -1,11 +1,8 @@
-import format from 'date-fns/format'
-import ptBR from 'date-fns/locale/pt-BR'
 import styles from './styles.module.scss'
+import { format } from '../../utils/date'
 
 export function Header () {
-  const currentDate = format(new Date(), 'EEEEEE, d MMMM', {
-    locale: ptBR
-  })
+  const currentDate = format(new Date(), 'EEEEEE, d MMMM')
 
   return (
     <header className={styles.headerContainer}>
