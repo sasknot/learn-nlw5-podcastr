@@ -4,12 +4,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { AxiosResponse } from 'axios'
 
+import api, { formatEpisode } from '../../services/api'
 import styles from './styles.module.scss'
-import api from '../../services/api'
-import { Episode, formatEpisode } from '../index'
 
 type EpisodeProps = {
-  episode: Episode
+  episode: Podcastr.Episode
 }
 
 export default function EpisodePage (props: EpisodeProps) {
@@ -59,8 +58,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const { slug } = context.params
-  const { data }: AxiosResponse<Episode> = await api.get(`episodes/${slug}`)
-  const episode: Episode = formatEpisode(data)
+  const { data }: AxiosResponse<Podcastr.Episode> = await api.get(`episodes/${slug}`)
+  const episode: Podcastr.Episode = formatEpisode(data)
 
   return {
     props: {

@@ -1,5 +1,5 @@
-import styles from './styles.module.scss'
 import { format } from '../../utils/date'
+import styles from './styles.module.scss'
 
 export function Header () {
   const currentDate = format(new Date(), 'EEEEEE, d MMMM')

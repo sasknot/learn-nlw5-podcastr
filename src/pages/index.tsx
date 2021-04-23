@@ -1,38 +1,22 @@
+import { useContext } from 'react'
 import { GetStaticProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AxiosResponse } from 'axios'
 
+import api, { formatEpisode } from '../services/api'
+import { PlayerContext } from '../contexts/player-context'
 import styles from './home.module.scss'
-import { format, convertDurationToTimeString } from '../utils/date'
-import api from '../services/api'
-
-export type EpisodeFile = {
-  url: string
-  type: string
-  duration: number
-  duration_formatted?: string
-}
-
-export type Episode = {
-  id: string
-  title: string
-  members: string
-  published_at: string
-  thumbnail: string
-  description: string
-  file: EpisodeFile
-  published_at_formatted?: string
-}
 
 type HomeProps = {
-  episodes: Array<Episode>
-  lastestEpisodes: Array<Episode>
-  allEpisodes: Array<Episode>
+  episodes: Array<Podcastr.Episode>
+  lastestEpisodes: Array<Podcastr.Episode>
+  allEpisodes: Array<Podcastr.Episode>
 }
 
 export default function Home (props: HomeProps) {
   const { episodes, lastestEpisodes, allEpisodes } = props
+  const { play } = useContext(PlayerContext)
 
   return (
     <div className={styles.homepage}>
@@ -40,7 +24,7 @@ export default function Home (props: HomeProps) {
         <h2>Últimos lançamentos</h2>
         <ul>
           {
-            lastestEpisodes.map((episode: Episode) => {
+            lastestEpisodes.map((episode: Podcastr.Episode) => {
               return (
                 <li key={episode.id}>
                   <Image
@@ -60,7 +44,7 @@ export default function Home (props: HomeProps) {
                     <span>{episode.file.duration_formatted}</span>
                   </div>
 
-                  <button type="button">
+                  <button type="button" onClick={() => play(episode)}>
                     <img src="/play-green.svg" alt="Tocar episódio" />
                   </button>
                 </li>
@@ -85,7 +69,7 @@ export default function Home (props: HomeProps) {
           </thead>
           <tbody>
             {
-              allEpisodes.map((episode: Episode) => {
+              allEpisodes.map((episode: Podcastr.Episode) => {
                 return (
                   <tr key={episode.id}>
                     <td style={{ width: 72 }}>
@@ -127,29 +111,17 @@ export default function Home (props: HomeProps) {
   )
 }
 
-export function formatEpisode (episode: Episode): Episode {
-  return {
-    ...episode,
-    published_at_formatted: format(episode.published_at, 'd MMM yy'),
-    file: {
-      ...episode.file,
-      duration: Number(episode.file.duration),
-      duration_formatted: convertDurationToTimeString(episode.file.duration)
-    }
-  }
-}
-
 export const getStaticProps: GetStaticProps = async () => {
-  const { data }: AxiosResponse<Episode[]> = await api.get('episodes', {
+  const { data }: AxiosResponse<Podcastr.Episode[]> = await api.get('episodes', {
     params: {
       _limit: 12,
       _sort: 'published_at',
       _order: 'desc'
     }
   })
-  const episodes: Episode[] = data.map(formatEpisode)
-  const lastestEpisodes: Episode[] = episodes.slice(0, 2)
-  const allEpisodes: Episode[] = episodes.slice(2, episodes.length)
+  const episodes: Podcastr.Episode[] = data.map(formatEpisode)
+  const lastestEpisodes: Podcastr.Episode[] = episodes.slice(0, 2)
+  const allEpisodes: Podcastr.Episode[] = episodes.slice(2, episodes.length)
 
   return {
     props: {
