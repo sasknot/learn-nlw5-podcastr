@@ -2,10 +2,12 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Link from 'next/link'
+import Head from 'next/head'
 import { AxiosResponse } from 'axios'
 
 import api, { formatEpisode } from '../../services/api'
 import styles from './styles.module.scss'
+import { usePlayer } from '../../contexts/player-context'
 
 type EpisodeProps = {
   episode: Podcastr.Episode
@@ -14,9 +16,14 @@ type EpisodeProps = {
 export default function EpisodePage (props: EpisodeProps) {
   const { episode } = props
   const router = useRouter()
+  const { playSingle } = usePlayer()
 
   return (
     <div className={styles.episode}>
+      <Head>
+        <title>{episode.title} | Podcastr</title>
+      </Head>
+
       <div className={styles.thumbnailContainer}>
         <Link href="/">
           <button type="button">
@@ -29,7 +36,7 @@ export default function EpisodePage (props: EpisodeProps) {
           objectFit="cover"
           src={episode.thumbnail}
         />
-        <button type="button">
+        <button type="button" onClick={() => playSingle(episode)}>
           <img src="/play.svg" alt="Tocar episódio" />
         </button>
       </div>
